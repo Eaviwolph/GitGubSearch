@@ -1,0 +1,62 @@
+@font-face {
+    font-family: "OpenSans";
+    src: url("/web/font/OpenSans/OpenSans-VariableFont_wdth,wght.ttf") format("OpenType");
+}
+
+.list {
+    margin-top: 1px;
+    margin-bottom: 5px;
+    margin-left: 50px;
+    background-color: #3b6688;
+    color: #fff;
+    border-radius: 7px;
+    padding: 2px 5px 2px 5px;
+    margin-right: 10px;
+}
+
+.links {
+    background-color: #004F74;
+    margin-left: -20px;
+    margin-bottom: 5px;
+    padding-left: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    width: 95%;
+    font-size: 20px;
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.languages {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#results {
+    width: 100%;
+    margin-top: 10px;
+}
+
+body {
+    font-family: "OpenSans";
+}
+
+input {
+    width: 30%;
+    padding: 10px;
+}
+
+button {
+    width: 20%;
+    padding: 10px;
+    background: #2196F3;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-left: none;
+    cursor: pointer;
+  }

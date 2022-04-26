@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GitHubSearch</title>
+    <link rel="stylesheet" type="text/css" href="/web/css/style.css">
+    <script type="text/javascript" src="/web/js/httpResponse.js"></script>
+</head>
+
+<body>
+    <h1>GitHub Search</h1>
+    <p>Performs a search on GitHub with the content of the search bar and displays the number of lines per language.</p>
+    
+    <!-- search bar + button. -->
+    <input type="search" name="search" id="input" placeholder="Github Search">
+    <button onclick="httpGet('search')">Search</button>
+
+    <!-- div where results are displayed. -->
+    <div id="results">
+    </div>
+
+</body>
+</html>
