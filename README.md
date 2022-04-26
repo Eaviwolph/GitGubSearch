@@ -1,5 +1,5 @@
-# GitGubSearch
-A GitGub Search server implemented in Go (backend) and html/css/js (frontend)  
+# GitHubSearch
+A GitHub Search server implemented in Go (backend) and html/css/js (frontend)  
 
 All the Backend code is located in __githubSearch.go__  
 Html code is located in __template__  
