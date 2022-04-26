@@ -1,11 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"githubSearch/gitAPISearch"
 	"html/template"
 	"log"
 	"net/http"
 )
+
+type getSearchResult struct {
+	/*
+	 *Structure that will be encoded and sent to the client as JSON.
+	 */
+	Repos []gitAPISearch.GitRepos
+}
 
 /*
  *That call the function gitSearch and send the result to the client
@@ -19,7 +27,18 @@ var handleFunc = func(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	if r.Method == "GET" && r.URL.Path == "/search" {
-		gitAPISearch.GetSearch(w, r)
+		keys, errQuery := r.URL.Query()["search"]
+		var key = ""
+		if !errQuery || len(keys[0]) < 1 {
+			log.Println("Url Param 'search' is missing or invalid")
+			return
+		}
+		key = keys[0]
+		var sr = getSearchResult{}
+		var totalRepo = 20
+		sr.Repos = gitAPISearch.GetSearch(key, totalRepo)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(sr)
 	} else {
 		tpl.ExecuteTemplate(w, "index.html", nil)
 	}

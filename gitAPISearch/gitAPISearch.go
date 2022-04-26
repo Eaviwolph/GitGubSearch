@@ -2,6 +2,7 @@ package gitAPISearch
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -9,14 +10,7 @@ import (
 )
 
 //Structure Definition.
-type getSearchResult struct {
-	/*
-	 *Structure that will be encoded and sent to the client as JSON.
-	 */
-	Repos []gitRepos
-}
-
-type gitRepos struct {
+type GitRepos struct {
 	/*
 	 *Structure that contains name and languages of the repository.
 	 */
@@ -47,14 +41,14 @@ type gitGlob struct {
  *Shared Variables used by the multi threading.
  */
 var threadNum = 10
-var threads = make([][]gitRepos, threadNum)
+var threads = make([][]GitRepos, threadNum)
 
 /*
  *Function that transform the tmpGitRepos structure to the gitRepos
  *structure by requesting GitHub all languages used by the repository.
  */
-func tmpGitToGitRepos(tmpGit tmpGitRepos) gitRepos {
-	var gitRepos = gitRepos{
+func tmpGitToGitRepos(tmpGit tmpGitRepos) GitRepos {
+	var gitRepos = GitRepos{
 		Name:           tmpGit.Name,
 		Full_name:      tmpGit.Full_name,
 		Languages:      make([]string, 0),
@@ -93,22 +87,22 @@ func tmpGitToGitRepos(tmpGit tmpGitRepos) gitRepos {
  *Function that return the gitRepos structure by requesting GitHub
  *and converting the tmpGitRepos structure to the gitRepos structure.
  */
-func gitSearch(filter string) []gitRepos {
-	url := "https://api.github.com/search/repositories?q=" + filter + "&page=1&per_page=20&sort=update"
+func gitSearch(filter string, totalRepo int) []GitRepos {
+	url := fmt.Sprintf("https://api.github.com/search/repositories?q=%s&page=1&per_page=%d&sort=update", filter, totalRepo)
 	var resp, err = http.Get(url)
 	if err != nil {
 		log.Println(err)
-		var list = make([]gitRepos, 0)
+		var list = make([]GitRepos, 0)
 		return list
 	}
 	var data gitGlob
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil { //Decode the body of the response into the data object
 		log.Println(err)
-		var list = make([]gitRepos, 0)
+		var list = make([]GitRepos, 0)
 		return list
 	}
 
-	var list = make([]gitRepos, 0)
+	var list = make([]GitRepos, 0)
 	var i = 0 //Counter for the number of started threads
 	var wg = sync.WaitGroup{}
 	for _, v := range data.Items {
@@ -123,7 +117,7 @@ func gitSearch(filter string) []gitRepos {
 				list = append(list, v...)
 			}
 			i = 0
-			threads = make([][]gitRepos, threadNum)
+			threads = make([][]GitRepos, threadNum)
 		}
 
 		wg.Add(1) //Start a new thread
@@ -144,7 +138,7 @@ func gitSearch(filter string) []gitRepos {
 			j++
 		}
 		i = 0
-		threads = make([][]gitRepos, threadNum)
+		threads = make([][]GitRepos, threadNum)
 	}
 	return list
 }
@@ -153,16 +147,6 @@ func gitSearch(filter string) []gitRepos {
  *That call the function gitSearch and send the result to the client
  *if the url request contains a query.
  */
-func GetSearch(w http.ResponseWriter, r *http.Request) {
-	keys, errQuery := r.URL.Query()["search"]
-	var key = ""
-	if !errQuery || len(keys[0]) < 1 {
-		log.Println("Url Param 'search' is missing or invalid")
-		return
-	}
-	key = keys[0]
-	var sr = getSearchResult{}
-	sr.Repos = gitSearch(key)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(sr)
+func GetSearch(key string, totalRepo int) []GitRepos {
+	return gitSearch(key, totalRepo)
 }
